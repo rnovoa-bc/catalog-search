@@ -1,0 +1,21 @@
+[project]
+name = "catalog-search"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Ramon Novoa", email = "rnovoa@bnc.cat" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "google-genai>=2.24.0",
+    "python-dotenv>=1.2.3",
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+catalog-search = "catalog_search:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
