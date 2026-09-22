@@ -1,4 +1,5 @@
 import os
+import re
 from dotenv import load_dotenv
 from google import genai
 import requests
@@ -6,6 +7,7 @@ from urllib.parse import quote
 import mariadb
 
 load_dotenv()
+
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 tools = [
 ]
@@ -16,7 +18,7 @@ generation_config = {
 
 }
 
-def cofre_indexing():
+def get_metadades():
     mariadb_connection = mariadb.connect(
         host=os.getenv("COFRE_HOST"),
         user=os.getenv("COFRE_USER"),
@@ -24,7 +26,13 @@ def cofre_indexing():
         database=os.getenv("COFRE_DB")
     )
     cursor = mariadb_connection.cursor()
-    cursor.execute("SELECT * FROM some_table")  # Replace 'some_table' with your actual table name
+    cursor.execute("SELECT uuid, valor FROM metadades where terme_id in (1, 2, 13)")
+    results = cursor.fetchall()
+    cursor.close()
+    mariadb_connection.close()
+    return results
+
+
 def get_gemini_response(user_prompt, alternatives=True):
     prompt = f"""
     Analitza la següent consulta de l'usuari d'una biblioteca: '{user_prompt}'.
@@ -115,6 +123,12 @@ def get_docs(query):
 
 def main():
 
+    # Mostrem les metadades de la base de dades
+    print("Metadades de la base de dades:")
+    metadades = get_metadades()
+    for uuid, valor in metadades:
+        print(f"UUID: {uuid}, Valor: {valor}")
+    print()
     # Bucle principal per demanar a l'usuari què vol cercar
     while True:
         user_input = input("Que voleu cercar (intro per finalitzar): ")
